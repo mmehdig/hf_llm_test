@@ -1,5 +1,5 @@
 # hf_llm_test
-Easy test hugging face LLM device performance.
+An easy test for huggingface LLM performance on a single device.
 
 # How to Install
 
