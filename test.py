@@ -6,15 +6,25 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 parser = argparse.ArgumentParser(description='Test HF generate')
 parser.add_argument("-d", "--device", default="cpu")
 parser.add_argument("-p", "--prompt", default="Today is")
+parser.add_argument("-m", "--model", default="microsoft/phi-2")
+parser.add_argument("-dt", "--dtype", default="auto")
 
 args = parser.parse_args()
 
 device = torch.device(args.device)
 prompt = args.prompt
+model_name = args.model
+dtype=args.dtype
 
-model = AutoModelForCausalLM.from_pretrained("microsoft/phi-2", device_map=device, trust_remote_code=True)
-tokenizer = AutoTokenizer.from_pretrained("microsoft/phi-2")
+if dtype in {"bfloat16", "bfp16"}:
+    dtype = torch.bfloat16
+elif dtype in {"float16", "fp16"}:
+    dtype = torch.float16
+elif dtype in {"float32", "fp32"}:
+    dtype = torch.float32
 
+model = AutoModelForCausalLM.from_pretrained(model_name, device_map=device, trust_remote_code=True)
+tokenizer = AutoTokenizer.from_pretrained(model_name)
 
 def gen(promt):
    input_ids = tokenizer(prompt, return_tensors="pt")["input_ids"].to(device)
